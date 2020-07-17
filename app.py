@@ -12,12 +12,18 @@ connect_str = 'DefaultEndpointsProtocol=https;AccountName=fhirtestingstore;Accou
 
 local_path = "./uploads"
 
-@app.route('/', methods=['GET', 'POST'])
+
+@app.route('/upload')
+def upload_file():
+    return render_template('index.html')
+
+
+@app.route('/uploader', methods=['GET', 'POST'])
 def upload_files():
     if request.method == 'POST':
         file = request.files['file']
         filename = secure_filename(file.filename)
-        file_extension = filename.rsplit('.',1)[1]
+        file_extension = filename.rsplit('.', 1)[1]
         print(file_extension)
         file.save(os.path.join(local_path, filename))
 
@@ -29,7 +35,7 @@ def upload_files():
             blob_service_client = BlobServiceClient.from_connection_string(connect_str)
 
             # Create a unique name for the container
-            container_name = "container" + str(uuid.uuid4())+file_extension
+            container_name = "container" + str(uuid.uuid4()) + file_extension
 
             # Create the container
             container_client = blob_service_client.create_container(container_name)
@@ -46,7 +52,7 @@ def upload_files():
         except Exception as ex:
             print('Exception:')
             print(ex)
-    return render_template('index.html')
+    return 'file uploaded successfully'
 
 
 if __name__ == '__main__':
